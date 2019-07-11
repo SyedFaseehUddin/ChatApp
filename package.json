@@ -1,0 +1,27 @@
+{
+  "name": "chatapp",
+  "version": "1.0.0",
+  "description": "A Simple Chat App",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "server": "nodemon server.js",
+    "client": "npm start --prefix client",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SyedFaseehUddin/ChatApp.git"
+  },
+  "author": "Faseeh",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/SyedFaseehUddin/ChatApp/issues"
+  },
+  "homepage": "https://github.com/SyedFaseehUddin/ChatApp#readme",
+  "dependencies": {
+    "concurrently": "^4.1.1",
+    "nodemon": "^1.19.1"
+  }
+}
