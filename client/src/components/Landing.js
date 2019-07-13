@@ -1,70 +1,100 @@
 import React, { Component, Fragment } from 'react'
+import ChatInput from './ChatInput'
+
+const URL = 'ws://localhost:8080'
 
 export default class Landing extends Component {
     state = {
         name: '',
         messages: [],
       }
+      
+  webSocket = new WebSocket(URL)
     
+  componentDidMount() {
+    this.webSocket.onopen = () => {
+      // checking connection
+      console.log('connected');
+    }
+
+    this.webSocket.onmessage = (e) => {
+      // on receiving a message add it to the list of messages
+      const message = JSON.parse(e.data);
+      this.addMessage(message);
+    }
+
+    this.webSocket.onclose = () => {
+      // i wanna know if its disconnected
+      console.log('disconnected');
+    }
+  }
+
+  addMessage = message =>
+    this.setState(state => ({ messages: [...state.messages, message] }))
+
+  submitMessage = messageString => {
+    // on submitting the message send it to webSocket and update state
+    const message = { name: this.state.name, message: messageString }
+    this.webSocket.send(JSON.stringify(message))
+    this.addMessage(message)
+  }
+
     render() {
+    // console.log("state : "+ JSON.stringify(this.state))
         return (
             <Fragment>
-            <div>
-            <div className="chat-body">
-              <div className="chat-body-inner">
-                <div className="chat-list">
-                    {/* Chat List */}
-                  <div className="chat-item otheruser">
-                    <div className="chat-item-inner">
-                      <div className="image"><img src="https://dummyimage.com/31*31/ffffff/00BCD4&text=PIC" alt="" width="30"/></div>
-                      <div className="message"><span>Hi</span></div>
-                      <div className="message-time"></div>
-                    </div>
-                  </div>
-                  <div className="chat-item otheruser">
-                    <div className="chat-item-inner">
-                      <div className="image"><img src="https://dummyimage.com/31*31/ffffff/00BCD4&text=PIC" alt="" width="30"/></div>
-                      <div className="message"><span>what's up?</span></div>
-                      <div className="message-time"></div>
-                    </div>
-                  </div>
-                  <div className="chat-item user">
-                    <div className="chat-item-inner">
-                      <div className="message"><span>Hello, I'm doing good.</span></div>
-                      <div className="message-time"></div>
-                    </div>
-                  </div>
-                  <div className="chat-item otheruser ">
-                    <div className="chat-item-inner">
-                      <div className="image"><img src="https://dummyimage.com/31*31/ffffff/00BCD4&text=PIC" alt="" width="30"/></div>
-                      <div className="message"><span>ok</span></div>
-                      <div className="message-time"></div>
-                    </div>
-                  </div>
-                  <div className="chat-item user ">
-                    <div className="chat-item-inner">
-                      <div className="message"><span>bye!</span></div>
-                      <div className="message-time"></div>
-                    </div>
-                  </div>
-                  
-                  
+                <div className="name-box">
+                    <input className="name-input"
+                        type="text"
+                        id={'name'}
+                        placeholder={'Enter your name...'}
+                        value={this.state.name}
+                        onChange={e => this.setState({ name: e.target.value })}
+                    />
                 </div>
-              </div>
-            </div>
-            <div className="message-form">
-              <form className="message-form-inner" action="">
-                <input className="message-input" type="text" placeholder="Type here...."/>
-                <button className="message-button" type="submit">
-                <svg class="svg-icon" viewBox="0 0 20 20">
-							<path d="M17.218,2.268L2.477,8.388C2.13,8.535,2.164,9.05,2.542,9.134L9.33,10.67l1.535,6.787c0.083,0.377,0.602,0.415,0.745,0.065l6.123-14.74C17.866,2.46,17.539,2.134,17.218,2.268 M3.92,8.641l11.772-4.89L9.535,9.909L3.92,8.641z M11.358,16.078l-1.268-5.613l6.157-6.157L11.358,16.078z"></path>
-						</svg>
-                </button>
-              </form>
-            </div>
-          </div>
+                <div className="chat-body">
+                    <div className="chat-body-inner">
+                        <div className="chat-list">
+                            {/* Chat List */}
+                            {this.state.messages.map((message, index) =>
+
+                            <Fragment key={index}>
+                                {this.state.name=== message.name ? (
+                                    <div className="chat-item user" >
+                                        <div className="chat-item-inner">
+                                            <div className="message"><span>{message.message}</span></div>
+                                            <div className="message-username">{message.name}</div>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="chat-item otheruser">
+                                        <div className="chat-item-inner">
+                                            <div className="image"><img src="https://dummyimage.com/31*31/ffffff/00BCD4&text=PIC" alt="" width="30"/></div>
+                                            <div className="message"><span>{message.message}</span></div>
+                                            <div className="message-username">{message.name}</div>
+                                        </div>
+                                    </div>
+                                ) }
+                            </Fragment>
+                            )}
+                        
+                        </div>
+                    </div>
+                </div>
+                <div className="message-form">
+                    {this.state.name ? (
+                        <ChatInput
+                            webSocket={this.webSocket}
+                            onSubmitMessage={messageString => this.submitMessage(messageString)}
+                        />
+                    ) : (
+                        <div style= {{textAlign : 'center'}}>
+                            Enter your name to chat...
+                        </div>
+                    ) }
+                    
+                </div>
         </Fragment>
-          
         )
     }
 }
