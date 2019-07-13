@@ -29,4 +29,4 @@ http://localhost:3000/
 
 ## Snapshot
 
-<img src="https://github.com/SyedFaseehUddin/ChatApp/blob/master/chatApp.PNG" height="480" width="270">
+<img src="https://github.com/SyedFaseehUddin/ChatApp/blob/master/chatApp.PNG" height="648px" width="925px">
